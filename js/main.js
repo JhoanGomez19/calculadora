@@ -20,33 +20,43 @@ const calculadora = {
 function ingresarNumero(mensaje) {
     return parseFloat(prompt(mensaje));
 }
-
 function calcular() {
-    const operacion = prompt("Ingrese la operación a realizar (+, -, *, /):");
-    const num1 = ingresarNumero("Ingrese el primer número:");
-    const num2 = ingresarNumero("Ingrese el segundo número:");
+    let continuar = true;
 
-    let resultado;
+    while (continuar) {
+        const operacion = prompt("Ingrese la operación a realizar (+, -, *, /) o 'fin' para salir:");
+        
+        if (operacion.toLowerCase() === 'fin') {
+            continuar = false;
+            break;
+        }
 
-    switch (operacion) {
-        case '+':
-            resultado = calculadora.sumar(num1, num2);
-            break;
-        case '-':
-            resultado = calculadora.restar(num1, num2);
-            break;
-        case '*':
-            resultado = calculadora.multiplicar(num1, num2);
-            break;
-        case '/':
-            resultado = calculadora.dividir(num1, num2);
-            break;
-        default:
-            resultado = "Operación no válida";
+        const num1 = ingresarNumero("Ingrese el primer número:");
+        const num2 = ingresarNumero("Ingrese el segundo número:");
+
+        let resultado;
+
+        switch (operacion) {
+            case '+':
+                resultado = calculadora.sumar(num1, num2);
+                break;
+            case '-':
+                resultado = calculadora.restar(num1, num2);
+                break;
+            case '*':
+                resultado = calculadora.multiplicar(num1, num2);
+                break;
+            case '/':
+                resultado = calculadora.dividir(num1, num2);
+                break;
+            default:
+                resultado = "Operación no válida";
+        }
+
+        alert(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
+        console.log(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
     }
-
-    alert(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
-    console.log(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
 }
+
 
 calcular();
