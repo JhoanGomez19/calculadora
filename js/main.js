@@ -1,62 +1,54 @@
-const calculadora = {
-    sumar: function(a, b) {
-        return a + b;
-    },
-    restar: function(a, b) {
-        return a - b;
-    },
-    multiplicar: function(a, b) {
-        return a * b;
-    },
-    dividir: function(a, b) {
-        if (b !== 0) {
-            return a / b;
-        } else {
-            return "Error: División por cero";
-        }
+class Producto {
+    constructor(nombre, precio) {
+      this.nombre = nombre;
+      this.precio = precio;
     }
-};
-
-function ingresarNumero(mensaje) {
-    return parseFloat(prompt(mensaje));
-}
-function calcular() {
-    let continuar = true;
-
-    while (continuar) {
-        const operacion = prompt("Ingrese la operación a realizar (+, -, *, /) o 'fin' para salir:");
-        
-        if (operacion.toLowerCase() === 'fin') {
-            continuar = false;
-            break;
-        }
-
-        const num1 = ingresarNumero("Ingrese el primer número:");
-        const num2 = ingresarNumero("Ingrese el segundo número:");
-
-        let resultado;
-
-        switch (operacion) {
-            case '+':
-                resultado = calculadora.sumar(num1, num2);
-                break;
-            case '-':
-                resultado = calculadora.restar(num1, num2);
-                break;
-            case '*':
-                resultado = calculadora.multiplicar(num1, num2);
-                break;
-            case '/':
-                resultado = calculadora.dividir(num1, num2);
-                break;
-            default:
-                resultado = "Operación no válida";
-        }
-
-        alert(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
-        console.log(`El resultado de ${num1} ${operacion} ${num2} es: ${resultado}`);
+  }
+  
+  class Carrito {
+    constructor() {
+      this.productos = [];
     }
-}
-
-
-calcular();
+  
+    agregarProducto(producto) {
+      this.productos.push(producto);
+    }
+  
+    calcularTotal() {
+      let total = 0;
+      for (const producto of this.productos) {
+        total += producto.precio;
+      }
+      return total;
+    }
+  
+    mostrarProductos() {
+      let listaProductos = "Productos en el carrito:\n";
+      for (const producto of this.productos) {
+        listaProductos += `${producto.nombre}: $${producto.precio}\n`;
+      }
+      alert(listaProductos);
+    }
+  }
+  
+  function agregarProductosAlCarrito() {
+    while (true) {
+      const nombreProducto = prompt("Ingrese el nombre del producto (o 'fin' para finalizar la compra):");
+      if (nombreProducto.toLowerCase() === "fin") {
+        break;
+      }
+      const precioProducto = parseFloat(prompt(`Ingrese el precio de ${nombreProducto}:`));
+      const producto = new Producto(nombreProducto, precioProducto);
+      carrito.agregarProducto(producto);
+      console.log(`${nombreProducto} ha sido agregado al carrito.`);
+    }
+  }
+  
+  const carrito = new Carrito();
+  
+  agregarProductosAlCarrito();
+  
+  const totalCompra = carrito.calcularTotal();
+  console.log("El total de la compra es: $" + totalCompra.toFixed(2));
+  
+  carrito.mostrarProductos();
