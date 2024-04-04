@@ -1,46 +1,103 @@
-const items = [
-  { id: 1, name: 'Producto 1', price: 10 },
-  { id: 2, name: 'Producto 2', price: 20 },
-  { id: 3, name: 'Producto 3', price: 30 }
-];
+document.addEventListener('DOMContentLoaded', function () {
+  const cart = document.getElementById('cart');
+  const cartCount = document.getElementById('cart-count');
+  const overlay = document.getElementById('overlay');
+  const closeCartButton = document.getElementById('close-cart');
+  const cartList = document.getElementById('cart-list');
 
-// Obtener elementos del carrito del almacenamiento local si existen
-let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+  let cartItems = [];
+  let total = 0;
 
-const cart = document.getElementById('cart');
-const itemList = document.getElementById('item-list');
-const totalPriceElement = document.getElementById('total-price');
-
-function renderItems() {
-  itemList.innerHTML = '';
-  items.forEach(item => {
-    const listItem = document.createElement('li');
-    listItem.className = 'item';
-    listItem.innerHTML = `
-      <span>${item.name} - $${item.price}</span>
-      <button onclick="addToCart(${item.id})">Agregar al carrito</button>
-    `;
-    itemList.appendChild(listItem);
-  });
-}
-
-function addToCart(itemId) {
-  const selectedItem = items.find(item => item.id === itemId);
-  if (selectedItem) {
-    cartItems.push(selectedItem);
-    updateLocalStorage();
-    renderCart();
+  if (localStorage.getItem('cartItems')) {
+      cartItems = JSON.parse(localStorage.getItem('cartItems'));
+      updateCart();
   }
-}
 
-function updateLocalStorage() {
-  localStorage.setItem('cartItems', JSON.stringify(cartItems));
-}
+  function updateCart() {
+      total = 0;
+      cartCount.textContent = cartItems.length;
+      cartList.innerHTML = '';
+      cartItems.forEach((item, index) => {
+          total += item.price;
+          const li = document.createElement('li');
+          li.textContent = `${item.name}: $${item.price}`;
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'Eliminar';
+          removeButton.className = 'product-remove';
+          removeButton.addEventListener('click', () => {
+              removeItem(index);
+          });
+          li.appendChild(removeButton);
+          cartList.appendChild(li);
+      });
+  }
 
-function renderCart() {
-  const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
-  totalPriceElement.textContent = totalPrice;
-}
+  function addToCart(name, price) {
+      cartItems.push({ name, price });
+      updateCart();
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }
 
-renderItems();
-renderCart();
+  function removeItem(index) {
+      cartItems.splice(index, 1);
+      updateCart();
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }
+
+  function handleAddToCart(event) {
+      const productCard = event.target.closest('.product-card');
+      const name = productCard.dataset.name;
+      const price = parseInt(productCard.dataset.price);
+
+      Swal.fire({
+          title: "Agregar al carrito",
+          text: `¿Estás seguro de agregar ${name} al carrito?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, agregar al carrito"
+      }).then((result) => {
+          if (result.isConfirmed) {
+              addToCart(name, price);
+              Swal.fire({
+                  title: "Agregado",
+                  text: `${name} ha sido agregado al carrito.`,
+                  icon: "success"
+              });
+          }
+      });
+  }
+
+  function handleCartClick() {
+      overlay.style.display = 'flex';
+  }
+
+  function handleCloseCart() {
+      overlay.style.display = 'none';
+  }
+
+  cart.addEventListener('click', handleCartClick);
+  closeCartButton.addEventListener('click', handleCloseCart);
+
+  const productCards = document.querySelectorAll('.add-to-cart');
+  productCards.forEach(card => {
+      card.addEventListener('click', handleAddToCart);
+  });
+
+  function getProducts() {
+      return fetch('https://api.example.com/products')
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('No se pudo obtener la lista de productos');
+              }
+              return response.json();
+          })
+          .then(data => data)
+          .catch(error => console.error('Error:', error));
+  }
+
+  getProducts().then(products => {
+      console.log(products);
+  });
+});
